@@ -1,8 +1,6 @@
 'use client'
 
-import { useChat, type Message } from 'ai/react'
-import { useLocalStorage } from '@/lib/hooks/use-local-storage'
-import { toast } from 'react-hot-toast'
+import { type Message } from 'ai/react'
 import { cn } from '@/lib/utils'
 
 import { ChatList } from '@/components/chat-list'

@@ -64,14 +64,14 @@ export class LLMInBrowser {
     };
   }
 
-  constructor(useWebWorker: boolean) {
-    // if (useWebWorker) {
-    //   this.chat = new ChatWorkerClient(
-    //     new Worker(new URL("./worker.ts", import.meta.url), { type: "module" })
-    //   );
-    // } else {
+  constructor(worker: Worker) {
+    if (worker) {
+      this.chat = new ChatWorkerClient(
+        worker
+      );
+    } else {
       this.chat = new ChatModule();
-    // }
+    }
   }
 
   async load(model: WebGPUModel) {

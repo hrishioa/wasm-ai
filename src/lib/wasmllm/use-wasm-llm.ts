@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { LLMInBrowser, WebGPUModel } from './wasmllm';
 import { ChatRequestOptions, CreateMessage, Message, nanoid } from 'ai';
 
@@ -68,15 +68,21 @@ type UseChatHelpers = {
 };
 
 export function useLocalChat({ model, initialMessages, initialInput, onFinish, onError }: UseChatOptions): UseChatHelpers {
-    const [llm] = useState(new LLMInBrowser(true));
+    const [llm, setLLM] = useState<LLMInBrowser | null>(null);
     const [messages, setMessages] = useState(initialMessages || []);
     const [input, setInput] = useState(initialInput || '');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<undefined | Error>();
+    const llmWorker = useRef<Worker>();
+
+    useEffect(() => {
+      llmWorker.current = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module'})
+      setLLM(new LLMInBrowser(llmWorker.current));
+    }, [])
 
     useEffect(() => {
         console.log('Model is ', model);
-        if(model) {
+        if(model && llm) {
             (async () => {
                 console.log('Loading model - ',model);
                 await llm.load(model)
@@ -84,59 +90,64 @@ export function useLocalChat({ model, initialMessages, initialInput, onFinish, o
             })();
             (window as any).llm = llm;
         }
-    }, [model]);
+    }, [model, llm]);
 
     const append = async (message: Message | CreateMessage, chatRequestOptions?: ChatRequestOptions) => {
-        setIsLoading(true);
+        if(llm) {
+            setIsLoading(true);
 
-        if(!message.id)
-            message.id = nanoid();
+            if(!message.id)
+                message.id = nanoid();
 
-        try {
-            await llm.ask(message.content);
-            const response = llm.getState().latestResponse;
+            try {
+                await llm.ask(message.content);
+                const response = llm.getState().latestResponse;
 
-            const assistantMessageId = nanoid();
+                const assistantMessageId = nanoid();
 
-            const assistantMessage: Message = {
-                id: assistantMessageId,
-                content: response,
-                createdAt: new Date(),
-                role: 'assistant'
-            };
+                const assistantMessage: Message = {
+                    id: assistantMessageId,
+                    content: response,
+                    createdAt: new Date(),
+                    role: 'assistant'
+                };
 
-            setMessages([...messages, message as Message, assistantMessage]);
-            onFinish && onFinish(response);
+                setMessages([...messages, message as Message, assistantMessage]);
+                onFinish && onFinish(response);
 
-            return assistantMessage.content || null;
-        } catch (err) {
-            setError(err as Error);
-            onError && onError(err as Error);
-            return (err as Error).toString();
-        } finally {
-            setIsLoading(false);
+                return assistantMessage.content || null;
+            } catch (err) {
+                setError(err as Error);
+                onError && onError(err as Error);
+                return (err as Error).toString();
+            } finally {
+                setIsLoading(false);
+            }
         }
     };
 
     const reload = async () => {
-        setIsLoading(true);
-        try {
-            await llm.clearHistory();
-            for (const message of messages) {
-                await llm.ask(message.content);
+        if(llm) {
+            setIsLoading(true);
+            try {
+                await llm.clearHistory();
+                for (const message of messages) {
+                    await llm.ask(message.content);
+                }
+            } catch (err) {
+                setError(err as Error);
+                onError && onError(err as Error);
+            } finally {
+                setIsLoading(false);
             }
-        } catch (err) {
-            setError(err as Error);
-            onError && onError(err as Error);
-        } finally {
-            setIsLoading(false);
-        }
 
-        return "Hello!";
+            return "Hello!";
+        }
     };
 
     const stop = async () => {
-        await llm.unload();
+        if(llm)
+            await llm.unload();
     };
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
