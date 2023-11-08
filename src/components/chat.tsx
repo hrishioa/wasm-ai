@@ -9,9 +9,8 @@ import { ChatList } from '@/components/chat-list'
 import { ChatPanel } from '@/components/chat-panel'
 import { EmptyScreen } from '@/components/empty-screen'
 import { ChatScrollAnchor } from '@/components/chat-scroll-anchor'
-// import { useLocalChat } from '../lib/wasmllm/use-wasm-llm'
-// import { SUPPORTED_LOCAL_MODELS } from '../lib/wasmllm/wasmllm'
-// import { useLocalChat } from '../lib/wasmllm/use-wasm-llm'
+import { useLocalChat } from '@/lib/wasmllm/use-wasm-llm'
+import { SUPPORTED_LOCAL_MODELS } from '@/lib/wasmllm/wasmllm'
 
 export interface ChatProps extends React.ComponentProps<'div'> {
   initialMessages?: Message[]
@@ -19,11 +18,11 @@ export interface ChatProps extends React.ComponentProps<'div'> {
 }
 
 export function Chat({ id, initialMessages, className }: ChatProps) {
-  // const c = useLocalChat({
-  //   model: SUPPORTED_LOCAL_MODELS['dolphin-2.2'],
-  //   initialMessages: initialMessages?.map(message => message.content),
-  //   initialInput: ''
-  // })
+  const c = useLocalChat({
+    model: SUPPORTED_LOCAL_MODELS['dolphin-2.2'],
+    initialMessages: initialMessages?.map(message => message.content),
+    initialInput: ''
+  })
 
 
   const [previewToken, setPreviewToken] = useLocalStorage<string | null>(
