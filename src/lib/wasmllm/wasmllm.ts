@@ -13,10 +13,15 @@ export type WebGPUModel = {
 export const SUPPORTED_LOCAL_MODELS: {
   [key: string]: WebGPUModel
 } = {
-  'dolphin-2.2.1': {
+  'dolphin-2.2.1-desktop': {
     modelName: "dolphin-2.2.1-mistral-7b-q4f32_1",
     modelParamsUrl: "http://192.168.50.177:8081/dolphin-2.2.1-mistral-7b-q4f32_1/params/",
     wasmUrl: "http://192.168.50.177:8081/dolphin-2.2.1-mistral-7b-q4f32_1/dolphin-2.2.1-mistral-7b-q4f32_1-webgpu.wasm"
+  },
+  'dolphin-2.2.1-hf': {
+    modelName: "dolphin-2.2.1-mistral-7b-q4f32_1",
+    modelParamsUrl: "https://huggingface.co/hrishioa/mlc-chat-dolphin-2.2.1-mistral-7b-q4f32_1/resolve/main/params/",
+    wasmUrl: "https://huggingface.co/hrishioa/mlc-chat-dolphin-2.2.1-mistral-7b-q4f32_1/resolve/main/dolphin-2.2.1-mistral-7b-q4f32_1-webgpu.wasm"
   }
 }
 
@@ -43,9 +48,9 @@ export class LLMInBrowser {
   }
 
   setLoadingState(report: any) {
-    console.log('Set loading state to ',report);
     this.loadingMessage = report.text;
     this.loadingPercent = report.progress*100;
+    console.log('Loading progress: ', report.progress, ' message: ', report.text);
     if(report.progress >= 1)
       this.chatState = 'ready';
   }
@@ -71,13 +76,14 @@ export class LLMInBrowser {
 
   async load(model: WebGPUModel) {
     this.model = model;
+    console.log('Loading ', model.modelName, ' with config ', this.getModelConfig(model));
     if (this.chatState === 'unloaded') {
       this.chat.setInitProgressCallback(this.setLoadingState.bind(this));
       this.chatState = 'loading';
       await this.chat.reload(this.model.modelName, undefined, this.getModelConfig(this.model));
       this.chatState = 'ready';
     } else {
-      console.error('LLM doesnt need to be loaded');
+      console.error('LLM doesnt need to be loaded - state is ', this.chatState);
     }
   }
 

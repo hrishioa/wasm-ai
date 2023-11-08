@@ -18,31 +18,31 @@ export interface ChatProps extends React.ComponentProps<'div'> {
 }
 
 export function Chat({ id, initialMessages, className }: ChatProps) {
-  const c = useLocalChat({
-    model: SUPPORTED_LOCAL_MODELS['dolphin-2.2'],
-    initialMessages: initialMessages?.map(message => message.content),
-    initialInput: ''
+  const { messages, append, reload, stop, isLoading, input, setInput } = useLocalChat({
+    model: SUPPORTED_LOCAL_MODELS['dolphin-2.2.1-desktop'],
+    initialMessages: initialMessages,
+    initialInput: '',
   })
 
+  // const [previewToken, setPreviewToken] = useLocalStorage<string | null>(
+  //   'ai-token',
+  //   null
+  // )
 
-  const [previewToken, setPreviewToken] = useLocalStorage<string | null>(
-    'ai-token',
-    null
-  )
-  const { messages, append, reload, stop, isLoading, input, setInput } =
-    useChat({
-      initialMessages,
-      id,
-      body: {
-        id,
-        previewToken
-      },
-      onResponse(response) {
-        if (response.status === 401) {
-          toast.error(response.statusText)
-        }
-      }
-    })
+  // const { messages, append, reload, stop, isLoading, input, setInput } =
+  //   useChat({
+  //     initialMessages,
+  //     id,
+  //     body: {
+  //       id,
+  //       previewToken
+  //     },
+  //     onResponse(response) {
+  //       if (response.status === 401) {
+  //         toast.error(response.statusText)
+  //       }
+  //     }
+  //   })
   return (
     <>
       <div className={cn('pb-[200px] pt-4 md:pt-10', className)}>

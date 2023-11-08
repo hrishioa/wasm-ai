@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { LLMInBrowser, WebGPUModel } from './wasmllm';
+import { ChatRequestOptions, CreateMessage, Message, nanoid } from 'ai';
 
 type UseChatOptions = {
     /**
@@ -12,7 +13,7 @@ type UseChatOptions = {
     /**
      * Initial messages of the chat. Useful to load an existing chat history.
      */
-    initialMessages?: string[];
+    initialMessages?: Message[];
     /**
      * Initial input of the chat.
      */
@@ -29,7 +30,7 @@ type UseChatOptions = {
 
 type UseChatHelpers = {
     /** Current messages in the chat */
-    messages: string[];
+    messages: Message[];
     /** The error object of the API request */
     error: undefined | Error;
     /**
@@ -37,13 +38,13 @@ type UseChatHelpers = {
      * the assistant's response.
      * @param message The message to append
      */
-    append: (message: string) => Promise<void>;
+    append: (message: Message | CreateMessage, chatRequestOptions?: ChatRequestOptions) => Promise<string | null | undefined>;
     /**
      * Reload the last AI chat response for the given chat history. If the last
      * message isn't from the assistant, it will request the API to generate a
      * new response.
      */
-    reload: () => Promise<void>;
+    reload: () => Promise<string | undefined>;
     /**
      * Abort the current request immediately, keep the generated tokens if any.
      */
@@ -53,7 +54,7 @@ type UseChatHelpers = {
      * edit the messages on the client, and then trigger the `reload` method
      * manually to regenerate the AI response.
      */
-    setMessages: (messages: string[]) => void;
+    setMessages: (messages: Message[]) => void;
     /** The current value of the input */
     input: string;
     /** setState-powered method to update the input value */
@@ -74,19 +75,44 @@ export function useLocalChat({ model, initialMessages, initialInput, onFinish, o
     const [error, setError] = useState<undefined | Error>();
 
     useEffect(() => {
-        llm.load(model).catch(setError);
-    }, [model, llm]);
+        console.log('Model is ', model);
+        if(model) {
+            (async () => {
+                console.log('Loading model - ',model);
+                await llm.load(model)
+                console.log('Loaded.');
+            })();
+            (window as any).llm = llm;
+        }
+    }, [model]);
 
-    const append = async (message: string) => {
+    const append = async (message: Message | CreateMessage, chatRequestOptions?: ChatRequestOptions) => {
         setIsLoading(true);
+
+        if(!message.id)
+            message.id = nanoid();
+
         try {
-            await llm.ask(message);
+            await llm.ask(message.content);
             const response = llm.getState().latestResponse;
-            setMessages([...messages, message, response]);
+
+            const assistantMessageId = nanoid();
+
+            const assistantMessage: Message = {
+                id: assistantMessageId,
+                content: response,
+                createdAt: new Date(),
+                role: 'assistant'
+            };
+
+            setMessages([...messages, message as Message, assistantMessage]);
             onFinish && onFinish(response);
+
+            return assistantMessage.content || null;
         } catch (err) {
             setError(err as Error);
             onError && onError(err as Error);
+            return (err as Error).toString();
         } finally {
             setIsLoading(false);
         }
@@ -97,7 +123,7 @@ export function useLocalChat({ model, initialMessages, initialInput, onFinish, o
         try {
             await llm.clearHistory();
             for (const message of messages) {
-                await llm.ask(message);
+                await llm.ask(message.content);
             }
         } catch (err) {
             setError(err as Error);
@@ -105,6 +131,8 @@ export function useLocalChat({ model, initialMessages, initialInput, onFinish, o
         } finally {
             setIsLoading(false);
         }
+
+        return "Hello!";
     };
 
     const stop = async () => {
@@ -117,7 +145,13 @@ export function useLocalChat({ model, initialMessages, initialInput, onFinish, o
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        append(input);
+        const userMessage:Message = {
+            id: nanoid(),
+            content: input,
+            createdAt: new Date(),
+            role: 'user'
+        }
+        append(userMessage);
         setInput('');
     };
 
