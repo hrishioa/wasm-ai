@@ -16,8 +16,10 @@ export interface ChatProps extends React.ComponentProps<'div'> {
 }
 
 export function Chat({ id, initialMessages, className }: ChatProps) {
-  const { messages, append, reload, stop, isLoading, input, setInput } = useLocalChat({
-    model: SUPPORTED_LOCAL_MODELS['dolphin-2.2.1-desktop'],
+  const selectedModel = SUPPORTED_LOCAL_MODELS['dolphin-2.2.1-hf'];
+
+  const { loadingMessage, loadingProgress, messages, append, reload, stop, isLoading, input, setInput } = useLocalChat({
+    model: selectedModel,
     initialMessages: initialMessages,
     initialInput: '',
   })
@@ -50,7 +52,7 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
             <ChatScrollAnchor trackVisibility={isLoading} />
           </>
         ) : (
-          <EmptyScreen setInput={setInput} />
+          <EmptyScreen setInput={setInput} welcomeMessage={`This chat is running ${selectedModel.simpleName} in your browser!`} />
         )}
       </div>
       <ChatPanel
@@ -62,6 +64,9 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         messages={messages}
         input={input}
         setInput={setInput}
+        loadingMessage={loadingMessage}
+        loadingProgress={loadingProgress}
+        selectedModel={selectedModel}
       />
     </>
   )

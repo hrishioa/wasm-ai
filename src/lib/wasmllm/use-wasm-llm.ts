@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { LLMInBrowser, WebGPUModel } from './wasmllm';
 import { ChatRequestOptions, CreateMessage, Message, nanoid } from 'ai';
 
@@ -29,6 +29,10 @@ type UseChatOptions = {
 };
 
 type UseChatHelpers = {
+    /** Current status message from the runner. */
+    loadingMessage: string;
+    /** Loading progress of the model */
+    loadingProgress: number;
     /** Current messages in the chat */
     messages: Message[];
     /** The error object of the API request */
@@ -74,10 +78,12 @@ export function useLocalChat({ model, initialMessages, initialInput, onFinish, o
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<undefined | Error>();
     const llmWorker = useRef<Worker>();
+    const [loadingMessage, setLoadingMessage] = useState('');
+    const [loadingProgress, setLoadingProgress] = useState(0);
 
     useEffect(() => {
       llmWorker.current = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module'})
-      setLLM(new LLMInBrowser(llmWorker.current));
+      setLLM(new LLMInBrowser(llmWorker.current, setLoadingMessage, setLoadingProgress));
     }, [])
 
     useEffect(() => {
@@ -92,6 +98,15 @@ export function useLocalChat({ model, initialMessages, initialInput, onFinish, o
         }
     }, [model, llm]);
 
+    function updateMessage(messages: Message[], newMessage: Message) {
+        const editMessageIndex = messages.findIndex((m) => m.id === newMessage.id);
+
+        const newMessages = editMessageIndex !== -1 ? [...messages.slice(0, editMessageIndex), newMessage, ...messages.slice(editMessageIndex + 1)] :
+        [...messages, newMessage];
+
+        return newMessages;
+    }
+
     const append = async (message: Message | CreateMessage, chatRequestOptions?: ChatRequestOptions) => {
         if(llm) {
             setIsLoading(true);
@@ -99,23 +114,27 @@ export function useLocalChat({ model, initialMessages, initialInput, onFinish, o
             if(!message.id)
                 message.id = nanoid();
 
+            setMessages((messages) => [...messages, message as Message]);
+
             try {
-                await llm.ask(message.content);
-                const response = llm.getState().latestResponse;
-
-                const assistantMessageId = nanoid();
-
                 const assistantMessage: Message = {
-                    id: assistantMessageId,
-                    content: response,
+                    id: nanoid(),
+                    content: '',
                     createdAt: new Date(),
                     role: 'assistant'
                 };
 
-                setMessages([...messages, message as Message, assistantMessage]);
-                onFinish && onFinish(response);
-
-                return assistantMessage.content || null;
+                await llm.ask(message.content, (partialMessage: string) => {
+                    setMessages((messages) => {
+                        return updateMessage(messages, {...assistantMessage, content: partialMessage});
+                    });
+                }, (fullMessage: string) => {
+                    setMessages((messages) => {
+                        return updateMessage(messages, {...assistantMessage, content: fullMessage});
+                    });
+                    onFinish && onFinish(fullMessage);
+                });
+                return null;
             } catch (err) {
                 setError(err as Error);
                 onError && onError(err as Error);
@@ -167,6 +186,8 @@ export function useLocalChat({ model, initialMessages, initialInput, onFinish, o
     };
 
     return {
+        loadingMessage,
+        loadingProgress,
         messages,
         error,
         append,
