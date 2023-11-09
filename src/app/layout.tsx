@@ -11,12 +11,12 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: "Next.js AI Chatbot",
-    template: `%s - Next.js AI Chatbot`,
+    default: "WASM AI",
+    template: `%s - WASM AI`,
   },
-  description: "An AI-powered chatbot template built with Next.js and Vercel.",
+  description: "Run Mistral in the browser, or any LLM.",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/icon.ico",
     shortcut: "/favicon-16x16.png",
     apple: "/apple-touch-icon.png",
   },
@@ -34,8 +34,6 @@ interface RootLayoutProps {
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
-  console.log("Loading root..");
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head />

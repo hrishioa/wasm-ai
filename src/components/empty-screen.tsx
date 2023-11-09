@@ -27,11 +27,14 @@ export function EmptyScreen({
   return (
     <div className="mx-auto max-w-2xl px-4">
       <div className="rounded-lg border bg-background p-8">
-        <h1 className="mb-2 text-lg font-semibold">{welcomeMessage}</h1>
-        <p className="mb-2 leading-normal text-muted-foreground">
+        <h1 className="mb-4 text-xl font-semibold">{welcomeMessage}</h1>
+        <p className="mb-1 leading-normal text-muted-foreground">
           Thanks to{" "}
           <ExternalLink href="https://nextjs.org">Next.js</ExternalLink> for
           making this look so nice.
+        </p>
+        <p className="leading-normal text-muted-foreground mb-5">
+          <ExternalLink href="https://twitter.com/hrishioa">Say hi on Twitter</ExternalLink> or <ExternalLink href="https://github.com/hrishioa/wasm-ai">check out the repo!</ExternalLink>
         </p>
         <p className="leading-normal text-muted-foreground">
           You can start a conversation here or try the following examples:
@@ -41,7 +44,7 @@ export function EmptyScreen({
             <Button
               key={index}
               variant="link"
-              className="h-auto p-0 text-base"
+              className="h-auto p-0 text-base p-1"
               onClick={() =>{
                 if(message.dynamicDataLoc)
                   fetch(message.dynamicDataLoc).then((data) => data.text()).then(text => setInput(message.message += '\n'+text))
