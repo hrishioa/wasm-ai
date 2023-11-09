@@ -1,28 +1,38 @@
-'use client'
+"use client";
 
-import { type Message } from 'ai/react'
-import { cn } from '@/lib/utils'
+import { type Message } from "ai/react";
+import { cn } from "@/lib/utils";
 
-import { ChatList } from '@/components/chat-list'
-import { ChatPanel } from '@/components/chat-panel'
-import { EmptyScreen } from '@/components/empty-screen'
-import { ChatScrollAnchor } from '@/components/chat-scroll-anchor'
-import { useLocalChat } from '@/lib/wasmllm/use-wasm-llm'
-import { SUPPORTED_LOCAL_MODELS } from '@/lib/wasmllm/wasmllm'
+import { ChatList } from "@/components/chat-list";
+import { ChatPanel } from "@/components/chat-panel";
+import { EmptyScreen } from "@/components/empty-screen";
+import { ChatScrollAnchor } from "@/components/chat-scroll-anchor";
+import { useLocalChat } from "@/lib/wasmllm/use-wasm-llm";
+import { SUPPORTED_LOCAL_MODELS } from "@/lib/wasmllm/wasmllm";
 
-export interface ChatProps extends React.ComponentProps<'div'> {
-  initialMessages?: Message[]
-  id?: string
+export interface ChatProps extends React.ComponentProps<"div"> {
+  initialMessages?: Message[];
+  id?: string;
 }
 
 export function Chat({ id, initialMessages, className }: ChatProps) {
-  const selectedModel = SUPPORTED_LOCAL_MODELS['dolphin-2.2.1-hf'];
+  const selectedModel = SUPPORTED_LOCAL_MODELS["dolphin-2.2.1-hf"];
 
-  const { loadingMessage, loadingProgress, messages, append, reload, stop, isLoading, input, setInput } = useLocalChat({
+  const {
+    loadingMessage,
+    loadingProgress,
+    messages,
+    append,
+    reload,
+    stop,
+    isLoading,
+    input,
+    setInput,
+  } = useLocalChat({
     model: selectedModel,
     initialMessages: initialMessages,
-    initialInput: '',
-  })
+    initialInput: "",
+  });
 
   // const [previewToken, setPreviewToken] = useLocalStorage<string | null>(
   //   'ai-token',
@@ -45,14 +55,17 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
   //   })
   return (
     <>
-      <div className={cn('pb-[200px] pt-4 md:pt-10', className)}>
+      <div className={cn("pb-[200px] pt-4 md:pt-10", className)}>
         {messages.length ? (
           <>
             <ChatList messages={messages} />
             <ChatScrollAnchor trackVisibility={isLoading} />
           </>
         ) : (
-          <EmptyScreen setInput={setInput} welcomeMessage={`This chat is running ${selectedModel.simpleName} in your browser!`} />
+          <EmptyScreen
+            setInput={setInput}
+            welcomeMessage={`This chat is running ${selectedModel.simpleName} in your browser!`}
+          />
         )}
       </div>
       <ChatPanel
@@ -69,5 +82,5 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
         selectedModel={selectedModel}
       />
     </>
-  )
+  );
 }

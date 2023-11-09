@@ -7,7 +7,7 @@ import { IconRefresh, IconStop } from "@/components/ui/icons";
 import { FooterText } from "@/components/footer";
 import ProgressBar from "@/components/ui/progress";
 import { WebGPUModel } from "@/lib/wasmllm/wasmllm";
-import { ExternalLink } from '@/components/external-link';
+import { ExternalLink } from "@/components/external-link";
 
 export interface ChatPanelProps
   extends Pick<
@@ -84,11 +84,17 @@ export function ChatPanel({
               isLoading={isLoading}
             />
           )}
-          <FooterText>{
-            loadingProgress < 100
-              ? loadingMessage || 'Waiting to load model...'
-              : <ExternalLink href={selectedModel.rootUrl || 'https://olickel.com'}>Talking to {selectedModel.modelName}</ExternalLink>
-          }</FooterText>
+          <FooterText>
+            {loadingProgress < 100 ? (
+              loadingMessage || "Waiting to load model..."
+            ) : (
+              <ExternalLink
+                href={selectedModel.rootUrl || "https://olickel.com"}
+              >
+                Talking to {selectedModel.modelName}
+              </ExternalLink>
+            )}
+          </FooterText>
         </div>
       </div>
     </div>

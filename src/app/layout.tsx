@@ -1,49 +1,49 @@
-import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
-import '@/app/globals.css'
-import { fontMono, fontSans } from '@/lib/fonts'
-import { Toaster } from 'react-hot-toast'
-import { cn } from '@/lib/utils'
-import { Providers } from '@/components/providers'
-import { TailwindIndicator } from '@/components/tailwind-indicator'
+import type { Metadata, Viewport } from "next";
+import { Inter } from "next/font/google";
+import "@/app/globals.css";
+import { fontMono, fontSans } from "@/lib/fonts";
+import { Toaster } from "react-hot-toast";
+import { cn } from "@/lib/utils";
+import { Providers } from "@/components/providers";
+import { TailwindIndicator } from "@/components/tailwind-indicator";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
-    default: 'Next.js AI Chatbot',
-    template: `%s - Next.js AI Chatbot`
+    default: "Next.js AI Chatbot",
+    template: `%s - Next.js AI Chatbot`,
   },
-  description: 'An AI-powered chatbot template built with Next.js and Vercel.',
+  description: "An AI-powered chatbot template built with Next.js and Vercel.",
   icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon-16x16.png',
-    apple: '/apple-touch-icon.png'
-  }
-}
+    icon: "/favicon.ico",
+    shortcut: "/favicon-16x16.png",
+    apple: "/apple-touch-icon.png",
+  },
+};
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'white' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' }
+    { media: "(prefers-color-scheme: light)", color: "white" },
+    { media: "(prefers-color-scheme: dark)", color: "black" },
   ],
-}
+};
 
 interface RootLayoutProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export default function RootLayout({ children }: RootLayoutProps) {
-  console.log('Loading root..');
+  console.log("Loading root..");
 
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
       <body
         className={cn(
-          'font-sans antialiased',
+          "font-sans antialiased",
           fontSans.variable,
-          fontMono.variable
+          fontMono.variable,
         )}
       >
         <Toaster />
@@ -57,5 +57,5 @@ export default function RootLayout({ children }: RootLayoutProps) {
         </Providers>
       </body>
     </html>
-  )
+  );
 }

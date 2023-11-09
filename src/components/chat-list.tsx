@@ -1,15 +1,15 @@
-import { type Message } from 'ai'
+import { type Message } from "ai";
 
-import { Separator } from '@/components/ui/separator'
-import { ChatMessage } from '@/components/chat-message'
+import { Separator } from "@/components/ui/separator";
+import { ChatMessage } from "@/components/chat-message";
 
 export interface ChatList {
-  messages: Message[]
+  messages: Message[];
 }
 
 export function ChatList({ messages }: ChatList) {
   if (!messages.length) {
-    return null
+    return null;
   }
 
   return (
@@ -23,5 +23,5 @@ export function ChatList({ messages }: ChatList) {
         </div>
       ))}
     </div>
-  )
+  );
 }

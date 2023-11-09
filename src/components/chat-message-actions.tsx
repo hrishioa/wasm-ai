@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import { type Message } from 'ai'
+import { type Message } from "ai";
 
-import { Button } from '@/components/ui/button'
-import { IconCheck, IconCopy } from '@/components/ui/icons'
-import { useCopyToClipboard } from '@/lib/hooks/use-copy-to-clipboard'
-import { cn } from '@/lib/utils'
+import { Button } from "@/components/ui/button";
+import { IconCheck, IconCopy } from "@/components/ui/icons";
+import { useCopyToClipboard } from "@/lib/hooks/use-copy-to-clipboard";
+import { cn } from "@/lib/utils";
 
-interface ChatMessageActionsProps extends React.ComponentProps<'div'> {
-  message: Message
+interface ChatMessageActionsProps extends React.ComponentProps<"div"> {
+  message: Message;
 }
 
 export function ChatMessageActions({
@@ -16,18 +16,18 @@ export function ChatMessageActions({
   className,
   ...props
 }: ChatMessageActionsProps) {
-  const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 })
+  const { isCopied, copyToClipboard } = useCopyToClipboard({ timeout: 2000 });
 
   const onCopy = () => {
-    if (isCopied) return
-    copyToClipboard(message.content)
-  }
+    if (isCopied) return;
+    copyToClipboard(message.content);
+  };
 
   return (
     <div
       className={cn(
-        'flex items-center justify-end transition-opacity group-hover:opacity-100 md:absolute md:-right-10 md:-top-2 md:opacity-0',
-        className
+        "flex items-center justify-end transition-opacity group-hover:opacity-100 md:absolute md:-right-10 md:-top-2 md:opacity-0",
+        className,
       )}
       {...props}
     >
@@ -36,5 +36,5 @@ export function ChatMessageActions({
         <span className="sr-only">Copy message</span>
       </Button>
     </div>
-  )
+  );
 }

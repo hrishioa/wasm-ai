@@ -1,16 +1,16 @@
-import React, { useEffect } from 'react';
-import * as Progress from '@radix-ui/react-progress';
+import React, { useEffect } from "react";
+import * as Progress from "@radix-ui/react-progress";
 
-const ProgressBar = ({progress}: {progress: number}) => {
+const ProgressBar = ({ progress }: { progress: number }) => {
   useEffect(() => {
-    console.log('Progress is ',progress)
-  }, [progress])
+    console.log("Progress is ", progress);
+  }, [progress]);
 
   return (
     <Progress.Root
       className="relative mx-1 overflow-hidden bg-background rounded-full h-[25px]"
       style={{
-        transform: 'translateZ(0)',
+        transform: "translateZ(0)",
       }}
       value={progress}
     >
