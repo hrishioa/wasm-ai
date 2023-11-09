@@ -11,7 +11,7 @@
 </div>
 
 <p align="center">
-  <a href="https://wasmai.vercel.app">Live Demo</a> •
+  <a target="_blank" href="https://wasmai.vercel.app">Live Demo</a> •
   <a href="#key-features">Key Features</a> •
   <a href="#one-click-deploy">One Click Deploy</a> •
   <a href="#usage">Usage</a> •
@@ -19,7 +19,7 @@
 
 <div align="center">
 
-![demol](https://github.com/hrishioa/wasm-ai/assets/973967/3e6cbeea-5964-4b18-b3c6-e5367c6ab866)
+https://github.com/hrishioa/wasm-ai/assets/973967/1326d279-c376-436a-8258-ad2abdf5e21e
 
 </div>
 
@@ -29,7 +29,7 @@ WASM AI puts together work from far more talented people (like the folks at [MLC
 
 ## Key Features
 
-This repo is meant to be a quickstart to build and iterate on local, open-source models in the browser, even distribute them as part of larger apps. We have a few things here that might be useful:
+This repo is meant to be a quickstart to build and iterate on local, open-source models in the browser, even distribute them as part of larger apps. We have a few things here that might be useful: 
 
 * **Two smart, compiled models**
  
