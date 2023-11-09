@@ -45,6 +45,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta property="og:image" content="https://wasm-ai.vercel.app/screenshot.png" />
+        <meta property="og:title" content="WASM AI" />
+        <meta property="og:description" content="Run Mistral in the browser, or any LLM." />
+        <meta property="og:url" content="https://wasm-ai.vercel.app" />
         <meta property="twitter:image" content="https://wasm-ai.vercel.app/screenshot.png" />
         <meta property="twitter:card" content="summary_large_image" />
         <meta property="twitter:creator" content="@hrishioa" />
