@@ -170,6 +170,7 @@ export function useLocalChat({
                 content: fullMessage,
               });
             });
+            setIsLoading(false);
             onFinish && onFinish(fullMessage);
           },
         );
@@ -178,8 +179,6 @@ export function useLocalChat({
         setError(err as Error);
         onError && onError(err as Error);
         return (err as Error).toString();
-      } finally {
-        setIsLoading(false);
       }
     }
   };
@@ -204,7 +203,8 @@ export function useLocalChat({
   };
 
   const stop = async () => {
-    if (llm) await llm.unload();
+    if (llm) await llm.stop();
+    setIsLoading(false);
   };
 
   const handleInputChange = (

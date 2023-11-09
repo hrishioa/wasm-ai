@@ -1,0 +1,7 @@
+```typescript
+type RF<T> = (r: RF<T>) => T;
+type YC<T> = (f: RF<T>) => T;
+
+const Y: YC<any> = <T>(f: RF<T>): T =>
+  (x => f(y => x(x)(y)))(x => f(y => x(x)(y)));
+```

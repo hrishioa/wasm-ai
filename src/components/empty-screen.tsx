@@ -7,15 +7,16 @@ import { IconArrowRight } from "@/components/ui/icons";
 const exampleMessages = [
   {
     heading: "Explain technical concepts",
-    message: `What is a "serverless function"?`,
+    message: `How does the soft launch system for a submarine launched missile work? Explain in detail.`,
   },
   {
-    heading: "Summarize an article",
-    message: "Summarize the following article for a 2nd grader: \n",
+    heading: "Work with code",
+    message: "Explain this code by telling me what it is at a high level, then go down levels of abstraction to make things clearer: \n",
+    dynamicDataLoc: '/wasmllm-code.txt'
   },
   {
-    heading: "Draft an email",
-    message: `Draft an email to my boss about the following: \n`,
+    heading: "Write something creative",
+    message: `Write a good 10 paragraph with a good character following three acts and the hero's journey with this writing prompt: "You died of a stress-induced aneurysm in the middle of your debate class. Now, at the gates of Valhalla, the Norse gods are arguing over whether or not it counted as a battle. Good thing you're very passionate about debating."\n`,
   },
 ];
 
@@ -41,7 +42,12 @@ export function EmptyScreen({
               key={index}
               variant="link"
               className="h-auto p-0 text-base"
-              onClick={() => setInput(message.message)}
+              onClick={() =>{
+                if(message.dynamicDataLoc)
+                  fetch(message.dynamicDataLoc).then((data) => data.text()).then(text => setInput(message.message += '\n'+text))
+                else
+                  setInput(message.message)}
+              }
             >
               <IconArrowRight className="mr-2 text-muted-foreground" />
               {message.heading}

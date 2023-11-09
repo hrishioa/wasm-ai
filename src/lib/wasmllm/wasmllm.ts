@@ -8,29 +8,6 @@ export type WebGPUModel = {
   simpleName: string;
 };
 
-export const SUPPORTED_LOCAL_MODELS: {
-  [key: string]: WebGPUModel;
-} = {
-  "dolphin-2.2.1-desktop": {
-    simpleName: "Dolphin 2.2.1 (Local)",
-    modelName: "dolphin-2.2.1-mistral-7b-q4f32_1",
-    modelParamsUrl:
-      "http://192.168.50.177:8081/dolphin-2.2.1-mistral-7b-q4f32_1/params/",
-    wasmUrl:
-      "http://192.168.50.177:8081/dolphin-2.2.1-mistral-7b-q4f32_1/dolphin-2.2.1-mistral-7b-q4f32_1-webgpu.wasm",
-  },
-  "dolphin-2.2.1-hf": {
-    simpleName: "Dolphin 2.2.1",
-    modelName: "dolphin-2.2.1-mistral-7b-q4f32_1",
-    rootUrl:
-      "https://huggingface.co/hrishioa/mlc-chat-dolphin-2.2.1-mistral-7b-q4f32_1",
-    modelParamsUrl:
-      "https://huggingface.co/hrishioa/mlc-chat-dolphin-2.2.1-mistral-7b-q4f32_1/resolve/main/params/",
-    wasmUrl:
-      "https://huggingface.co/hrishioa/mlc-chat-dolphin-2.2.1-mistral-7b-q4f32_1/resolve/main/dolphin-2.2.1-mistral-7b-q4f32_1-webgpu.wasm",
-  },
-};
-
 export class LLMInBrowser {
   private chat: ChatInterface;
   private chatState: "unloaded" | "loading" | "ready" | "streaming" =
@@ -109,6 +86,13 @@ export class LLMInBrowser {
       this.chatState = "ready";
     } else {
       console.error("LLM doesnt need to be loaded - state is ", this.chatState);
+    }
+  }
+
+  async stop() {
+    if(this.chatState === "streaming") {
+      await this.chat.interruptGenerate();
+      this.chatState = "ready";
     }
   }
 
