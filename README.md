@@ -2,7 +2,7 @@
   WASM AI
 </h1>
 
-<h2 align="center">Everything you need to run llms natively in the browser, and look good doing it.</h3>
+<h2 align="center">Everything you need to run llms natively in the browser<br> and look good doing it.</h3>
 
 <div align="center">
 
@@ -14,11 +14,12 @@
   <a href="https://wasmai.vercel.app">Live Demo</a> •
   <a href="#key-features">Key Features</a> •
   <a href="#one-click-deploy">One Click Deploy</a> •
-  <a href="#installation">Installation</a> •
   <a href="#usage">Usage</a> •
 </p>
 
 <div align="center">
+
+![demol](https://github.com/hrishioa/wasm-ai/assets/973967/3e6cbeea-5964-4b18-b3c6-e5367c6ab866)
 
 </div>
 
@@ -55,7 +56,7 @@ Deploy your own to Vercel with a single click:
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fhrishioa%2Fai-in-a-browser&project-name=custom-wasm-ai&repository-name=custom-wasm-ai&demo-title=WASM%20AI&demo-description=Run%20large%20language%20models%20in%20the%20browser%2C%20using%20WebGPU.&demo-url=https%3A%2F%2Fwasmai.vercel.app)
 
-# Running Locally
+# Usage
 
 Clone the repo. Then:
 
