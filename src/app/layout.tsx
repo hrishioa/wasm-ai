@@ -1,13 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
 import "@/app/globals.css";
 import { fontMono, fontSans } from "@/lib/fonts";
 import { Toaster } from "react-hot-toast";
 import { cn } from "@/lib/utils";
 import { Providers } from "@/components/providers";
-import { TailwindIndicator } from "@/components/tailwind-indicator";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: {
@@ -20,6 +16,17 @@ export const metadata: Metadata = {
     shortcut: "/favicon-16x16.png",
     apple: "/apple-touch-icon.png",
   },
+  openGraph: {
+    "images": [
+      "/screenshot.png"
+    ],
+    "siteName": "WASM AI",
+    "title": "WASM AI",
+    "description": "Run Mistral in the browser, or any LLM.",
+    "type": "website",
+    "locale": "en_US",
+    "url": "https://wasm-ai.vercel.app",
+  }
 };
 
 export const viewport: Viewport = {
