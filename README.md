@@ -20,8 +20,6 @@
 
 <div align="center">
 
-![output2](https://github.com/hrishioa/ai-in-a-browser/assets/973967/9d4053af-5d3d-494f-a8ae-53c6c0b3804a.mp4)
-
 </div>
 
 WASM AI is a quickstart template to run large language models completely in the browser. Modern 7B LLMs (even quantized to q4) are incredibly intelligent - good enough for text-to-SQL search, creative writing, analysis, NLP and other tasks - or to be a friend on an airplane. You can now run them in the browser for complete privacy, at blazing inference speeds, without a cent of cloud costs.
