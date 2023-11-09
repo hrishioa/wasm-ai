@@ -37,7 +37,7 @@ This repo is meant to be a quickstart to build and iterate on local, open-source
 
 * **Swap between local and cloud easily**
 
-  - I kept things as compatible as I could with Vercel's AI library, which has useful things like backpressure and streaming. You can swap them [by changing these two constants](https://github.com/hrishioa/ai-in-a-browser/blob/3597ae2652d0d8f2ad059016943c27f20d9c1c6e/src/components/chat.tsx#L19C1-L22C77). That's it. This should make testing and validation easier for your apps.
+  - I kept things as compatible as I could with Vercel's AI library, which has useful things like backpressure and streaming. You can swap them [by changing these two constants](https://github.com/hrishioa/wasm-ai/blob/3597ae2652d0d8f2ad059016943c27f20d9c1c6e/src/components/chat.tsx#L19C1-L22C77). That's it. This should make testing and validation easier for your apps.
 
 * **Web workers**
 
@@ -54,7 +54,7 @@ This repo is meant to be a quickstart to build and iterate on local, open-source
 
 Deploy your own to Vercel with a single click:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fhrishioa%2Fai-in-a-browser&project-name=custom-wasm-ai&repository-name=custom-wasm-ai&demo-title=WASM%20AI&demo-description=Run%20large%20language%20models%20in%20the%20browser%2C%20using%20WebGPU.&demo-url=https%3A%2F%2Fwasmai.vercel.app)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fhrishioa%2Fwasm-ai&project-name=custom-wasm-ai&repository-name=custom-wasm-ai&demo-title=WASM%20AI&demo-description=Run%20large%20language%20models%20in%20the%20browser%2C%20using%20WebGPU.&demo-url=https%3A%2F%2Fwasmai.vercel.app)
 
 # Usage
 
