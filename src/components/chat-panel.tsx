@@ -35,10 +35,12 @@ export function ChatPanel({
   loadingMessage,
   loadingProgress,
   selectedModel,
+  localModel,
 }: ChatPanelProps & {
   loadingMessage: string;
   loadingProgress: number;
   selectedModel: WebGPUModel;
+  localModel: boolean;
 }) {
   return (
     <div className="fixed inset-x-0 bottom-0 bg-gradient-to-b from-muted/10 from-10% to-muted/30 to-50%">
@@ -76,13 +78,13 @@ export function ChatPanel({
           <FooterText>
             {loadingProgress < 100 ? (
               loadingMessage || "Waiting to load model..."
-            ) : (
+            ) : localModel ? (
               <ExternalLink
                 href={selectedModel.rootUrl || "https://olickel.com"}
               >
                 Talking to {selectedModel.modelName}
               </ExternalLink>
-            )}
+            ) : 'You are talking to a cloud model. Boo!'}
           </FooterText>
         </div>
       </div>

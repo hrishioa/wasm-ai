@@ -11,7 +11,7 @@ const exampleMessages = [
   },
   {
     heading: "Work with code",
-    message: "Explain this code by telling me what it is at a high level, then go down levels of abstraction to make things clearer: \n",
+    message: "What is this code? Explain what it is, then help me understand by translating to python, and going down levels of abstraction (with code and text) to explain: \n",
     dynamicDataLoc: '/wasmllm-code.txt'
   },
   {

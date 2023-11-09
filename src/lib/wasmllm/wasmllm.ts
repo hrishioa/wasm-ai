@@ -49,12 +49,6 @@ export class LLMInBrowser {
     this.loadingMessageCallback && this.loadingMessageCallback(report.text);
     this.loadingProgressCallback &&
       this.loadingProgressCallback(report.progress * 100);
-    console.log(
-      "Loading progress: ",
-      report.progress,
-      " message: ",
-      report.text,
-    );
     if (report.progress >= 1) this.chatState = "ready";
   }
 
@@ -69,13 +63,13 @@ export class LLMInBrowser {
 
   async load(model: WebGPUModel) {
     this.model = model;
-    console.log(
-      "Loading ",
-      model.modelName,
-      " with config ",
-      this.getModelConfig(model),
-    );
     if (this.chatState === "unloaded") {
+      console.log(
+        "Loading ",
+        model.modelName,
+        " with config ",
+        this.getModelConfig(model),
+      );
       this.chat.setInitProgressCallback(this.setLoadingState.bind(this));
       this.chatState = "loading";
       await this.chat.reload(
@@ -116,25 +110,14 @@ export class LLMInBrowser {
     onFinishCallback?: (fullMessage: string) => void,
     interrupt: boolean = false,
   ) {
-    console.log(
-      "Got ask ",
-      input,
-      " with interrupt ",
-      interrupt,
-      " and chat state ",
-      this.chatState,
-    );
-
     const getResponsetoken = (step: number, message: string) => {
       if (this.chatState === "ready") return;
       if (message.length === 0) {
-        console.log("End of response");
         this.chat.interruptGenerate();
         this.chatState = "ready";
         onFinishCallback && onFinishCallback(this.latestResponse);
         return;
       }
-      console.log("Got response: step ", step, " message ", message);
       this.latestResponse = message;
       if (partialMessageCallback) partialMessageCallback(message);
     };
@@ -151,7 +134,6 @@ export class LLMInBrowser {
     this.chat.generate(input, getResponsetoken.bind(this)).then(() => {
       if (this.chatState !== "ready")
         onFinishCallback && onFinishCallback(this.latestResponse);
-      console.log("Finished generating");
       this.chatState = "ready";
     });
   }
