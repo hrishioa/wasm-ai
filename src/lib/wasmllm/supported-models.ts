@@ -23,4 +23,14 @@ export const SUPPORTED_LOCAL_MODELS: {
     wasmUrl:
       "https://huggingface.co/hrishioa/wasm-OpenHermes-2.5-Mistral-7B-q4f32_1/resolve/main/OpenHermes-2.5-Mistral-7B-q4f32_1-webgpu.wasm",
   },
+  "glaive-coder": {
+    simpleName: "Glaive Coder 7B",
+    modelName: "glaive-coder-7b-q4f32_1",
+    rootUrl:
+      "https://huggingface.co/cfahlgren1/wasm-glaive-coder-7b-q4f32_1",
+    modelParamsUrl:
+      "https://huggingface.co/cfahlgren1/wasm-glaive-coder-7b-q4f32_1/resolve/main/params/",
+    wasmUrl:
+      "https://huggingface.co/cfahlgren1/wasm-glaive-coder-7b-q4f32_1/resolve/main/glaive-coder-7b-q4f32_1-webgpu.wasm",
+  },
 };
