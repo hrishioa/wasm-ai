@@ -11,6 +11,7 @@ type MicButtonProps = {
   setBlobUrl: (blobUrl: string) => void;
   setAudioData: (audioData: Uint8Array) => void;
   setAudioMetadata: (audioMetadata: AudioMetadata) => void;
+  setAudioActive: React.Dispatch<React.SetStateAction<boolean>>;
 } & Pick<UseChatHelpers, "setInput">;
 
 export interface AudioMetadata {
@@ -54,9 +55,11 @@ const MicButton = (props: MicButtonProps) => {
           ? input.slice(0, -LISTENING_TEXT.length)
           : input
       );
+      props.setAudioActive(false);
       await handleStop();
     } else {
       props.setInput((input) => input + LISTENING_TEXT);
+      props.setAudioActive(true);
       await handleRecord();
     }
     setIsRecording(!isRecording);
@@ -68,7 +71,10 @@ const MicButton = (props: MicButtonProps) => {
       onClick={handleClick}
       className={cn(
         buttonVariants({ size: "sm", variant: "outline" }),
-        "absolute left-0 top-4 h-8 w-8 rounded-full bg-background p-0 sm:left-4 text-primary"
+        "absolute left-0 top-4 h-8 w-8 rounded-full p-0 sm:left-4",
+        isRecording
+          ? "bg-red-600 text-background hover:bg-red-400 hover:text-background"
+          : "bg-background text-primary"
       )}
     >
       {isRecording ? <IconListening /> : <IconMic />}

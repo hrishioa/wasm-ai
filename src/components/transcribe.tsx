@@ -10,7 +10,12 @@ import { cn } from "../lib/utils";
 import MicButton, { AudioMetadata } from "./micbutton";
 import { UseChatHelpers } from "ai/react";
 
-export const Transcribe = ({ setInput }: Pick<UseChatHelpers, "setInput">) => {
+export const Transcribe = ({
+  setInput,
+  setAudioActive,
+}: Pick<UseChatHelpers, "setInput"> & {
+  setAudioActive: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   const [modelLoading, setModelLoading] = useState<boolean>(false);
   const [loadedModel, setLoadedModel] = useState<AvailableModels | null>(null);
   const [loaded, setLoaded] = useState<boolean>(false);
@@ -75,6 +80,7 @@ export const Transcribe = ({ setInput }: Pick<UseChatHelpers, "setInput">) => {
 
       setInput((input) => input + TRANSCRIBING_TEXT);
       setTranscribing(true);
+      setAudioActive(true);
       await session.current.transcribe(
         audioData!,
         audioMetadata!.fromMic,
@@ -91,6 +97,7 @@ export const Transcribe = ({ setInput }: Pick<UseChatHelpers, "setInput">) => {
       );
       transcription.current = "";
       setAudioData(null);
+      setAudioActive(false);
       setTranscribing(false);
 
       console.log("Transcription done");
@@ -99,7 +106,14 @@ export const Transcribe = ({ setInput }: Pick<UseChatHelpers, "setInput">) => {
     if (audioData && loadedModel && !transcribing) {
       runSession();
     }
-  }, [audioMetadata, audioData, loadedModel, transcribing, setInput]);
+  }, [
+    audioMetadata,
+    audioData,
+    loadedModel,
+    transcribing,
+    setInput,
+    setAudioActive,
+  ]);
 
   return (
     (selectedModel != loadedModel && progress == 0 && (
@@ -115,6 +129,7 @@ export const Transcribe = ({ setInput }: Pick<UseChatHelpers, "setInput">) => {
       </Button>
     )) || (
       <MicButton
+        setAudioActive={setAudioActive}
         setBlobUrl={setBlobUrl}
         setAudioData={setAudioData}
         setAudioMetadata={setAudioMetadata}

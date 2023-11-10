@@ -12,6 +12,7 @@ import {
 import { useEnterSubmit } from "@/lib/hooks/use-enter-submit";
 import { useRouter } from "next/navigation";
 import { Transcribe } from "./transcribe";
+import { useState } from "react";
 
 export interface PromptProps
   extends Pick<UseChatHelpers, "input" | "setInput"> {
@@ -28,6 +29,7 @@ export function PromptForm({
   const { formRef, onKeyDown } = useEnterSubmit();
   const inputRef = React.useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
+  const [audioActive, setAudioActive] = useState(false);
 
   React.useEffect(() => {
     if (inputRef.current) {
@@ -79,7 +81,7 @@ export function PromptForm({
           className="min-h-[60px] w-full resize-none bg-transparent px-4 py-[1.3rem] focus-within:outline-none sm:text-sm"
         />
         <div className="absolute left-0 top-0">
-          <Transcribe setInput={setInput} />
+          <Transcribe setInput={setInput} setAudioActive={setAudioActive} />
         </div>
         <div className="absolute right-0 top-4 sm:right-4">
           <Tooltip>
@@ -87,7 +89,7 @@ export function PromptForm({
               <Button
                 type="submit"
                 size="icon"
-                disabled={isLoading || input === ""}
+                disabled={isLoading || audioActive || input === ""}
               >
                 <IconArrowElbow />
                 <span className="sr-only">Send message</span>
