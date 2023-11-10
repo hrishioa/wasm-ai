@@ -31,7 +31,7 @@ export const Transcribe = ({
 
   const TRANSCRIBING_TEXT = " (transcribing...)";
 
-  const selectedModel = AvailableModels.WHISPER_BASE;
+  const selectedModel = AvailableModels.WHISPER_TINY;
 
   const session = useRef<InferenceSession | null>(null);
 
