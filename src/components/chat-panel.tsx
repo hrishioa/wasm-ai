@@ -8,6 +8,7 @@ import { FooterText } from "@/components/footer";
 import ProgressBar from "@/components/ui/progress";
 import { WebGPUModel } from "@/lib/wasmllm/wasmllm";
 import { ExternalLink } from "@/components/external-link";
+import { Transcribe } from "./transcribe";
 
 export interface ChatPanelProps
   extends Pick<
@@ -46,7 +47,7 @@ export function ChatPanel({
     <div className="fixed inset-x-0 bottom-0 bg-gradient-to-b from-muted/10 from-10% to-muted/30 to-50%">
       <ButtonScrollToBottom />
       <div className="mx-auto sm:max-w-2xl sm:px-4">
-        <div className="flex h-10 items-center justify-center">
+        <div className="flex h-10 items-center justify-center space-x-2">
           {isLoading ? (
             <Button
               variant="outline"
@@ -84,7 +85,9 @@ export function ChatPanel({
               >
                 Talking to {selectedModel.modelName}
               </ExternalLink>
-            ) : 'You are talking to a cloud model. Boo!'}
+            ) : (
+              "You are talking to a cloud model. Boo!"
+            )}
           </FooterText>
         </div>
       </div>

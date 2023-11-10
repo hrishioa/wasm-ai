@@ -171,6 +171,34 @@ function IconArrowDown({ className, ...props }: React.ComponentProps<"svg">) {
   );
 }
 
+function IconMic({ className, ...props }: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 256 256"
+      fill="currentColor"
+      className={cn("h-4 w-4", className)}
+      {...props}
+    >
+      <path d="M128,176a48.05,48.05,0,0,0,48-48V64a48,48,0,0,0-96,0v64A48.05,48.05,0,0,0,128,176ZM96,64a32,32,0,0,1,64,0v64a32,32,0,0,1-64,0Zm40,143.6V232a8,8,0,0,1-16,0V207.6A80.11,80.11,0,0,1,48,128a8,8,0,0,1,16,0,64,64,0,0,0,128,0,8,8,0,0,1,16,0A80.11,80.11,0,0,1,136,207.6Z" />
+    </svg>
+  );
+}
+
+function IconListening({ className, ...props }: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 256 256"
+      fill="currentColor"
+      className={cn("h-4 w-4", className)}
+      {...props}
+    >
+      <path d="M240,128a8,8,0,0,1-8,8H204.94l-37.78,75.58A8,8,0,0,1,160,216h-.4a8,8,0,0,1-7.08-5.14L95.35,60.76,63.28,131.31A8,8,0,0,1,56,136H24a8,8,0,0,1,0-16H50.85L88.72,36.69a8,8,0,0,1,14.76.46l57.51,151,31.85-63.71A8,8,0,0,1,200,120h32A8,8,0,0,1,240,128Z" />
+    </svg>
+  );
+}
+
 function IconArrowRight({ className, ...props }: React.ComponentProps<"svg">) {
   return (
     <svg
@@ -505,4 +533,6 @@ export {
   IconUsers,
   IconExternalLink,
   IconChevronUpDown,
+  IconMic,
+  IconListening,
 };

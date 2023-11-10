@@ -44,7 +44,7 @@ type UseChatHelpers = {
    */
   append: (
     message: Message | CreateMessage,
-    chatRequestOptions?: ChatRequestOptions,
+    chatRequestOptions?: ChatRequestOptions
   ) => Promise<string | null | undefined>;
   /**
    * Reload the last AI chat response for the given chat history. If the last
@@ -70,7 +70,7 @@ type UseChatHelpers = {
   handleInputChange: (
     e:
       | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>,
+      | React.ChangeEvent<HTMLTextAreaElement>
   ) => void;
   /** Form submission handler to automatically reset input and append a user message  */
   handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
@@ -99,16 +99,11 @@ export function useLocalChat({
       type: "module",
     });
     setLLM(
-      new LLMInBrowser(
-        llmWorker.current,
-        setLoadingMessage,
-        setLoadingProgress,
-      ),
+      new LLMInBrowser(llmWorker.current, setLoadingMessage, setLoadingProgress)
     );
   }, []);
 
   useEffect(() => {
-    console.log("Model is ", model);
     if (model && llm) {
       (async () => {
         console.log("Loading model - ", model);
@@ -136,7 +131,7 @@ export function useLocalChat({
 
   const append = async (
     message: Message | CreateMessage,
-    chatRequestOptions?: ChatRequestOptions,
+    chatRequestOptions?: ChatRequestOptions
   ) => {
     if (llm) {
       setIsLoading(true);
@@ -172,7 +167,7 @@ export function useLocalChat({
             });
             setIsLoading(false);
             onFinish && onFinish(fullMessage);
-          },
+          }
         );
         return null;
       } catch (err) {
@@ -210,7 +205,7 @@ export function useLocalChat({
   const handleInputChange = (
     e:
       | React.ChangeEvent<HTMLInputElement>
-      | React.ChangeEvent<HTMLTextAreaElement>,
+      | React.ChangeEvent<HTMLTextAreaElement>
   ) => {
     setInput(e.target.value);
   };
