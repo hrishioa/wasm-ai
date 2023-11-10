@@ -33,4 +33,14 @@ export const SUPPORTED_LOCAL_MODELS: {
     wasmUrl:
       "https://huggingface.co/cfahlgren1/wasm-glaive-coder-7b-q4f32_1/resolve/main/glaive-coder-7b-q4f32_1-webgpu.wasm",
   },
+  "sql-coder": {
+    simpleName: "SQLCoder 7B",
+    modelName: "sqlcoder-7b-q4f32_1",
+    rootUrl:
+      "https://huggingface.co/cfahlgren1/wasm-sqlcoder-7b-q4f32_1",
+    modelParamsUrl:
+      "https://huggingface.co/cfahlgren1/wasm-sqlcoder-7b-q4f32_1/resolve/main/params/",
+    wasmUrl:
+      "https://huggingface.co/cfahlgren1/wasm-sqlcoder-7b-q4f32_1/resolve/main/sqlcoder-7b-q4f32_1-webgpu.wasm",
+  },
 };
