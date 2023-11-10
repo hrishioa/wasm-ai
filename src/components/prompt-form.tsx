@@ -2,16 +2,16 @@ import { UseChatHelpers } from "ai/react";
 import * as React from "react";
 import Textarea from "react-textarea-autosize";
 
-import { Button, buttonVariants } from "@/components/ui/button";
-import { IconArrowElbow, IconPlus } from "@/components/ui/icons";
+import { Button } from "@/components/ui/button";
+import { IconArrowElbow } from "@/components/ui/icons";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useEnterSubmit } from "@/lib/hooks/use-enter-submit";
-import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { Transcribe } from "./transcribe";
 
 export interface PromptProps
   extends Pick<UseChatHelpers, "input" | "setInput"> {
@@ -47,7 +47,7 @@ export function PromptForm({
       }}
       ref={formRef}
     >
-      <div className="relative flex max-h-60 w-full grow flex-col overflow-hidden bg-background px-8 sm:rounded-md sm:border sm:px-12">
+      <div className="relative flex max-h-60 w-full grow flex-col bg-background px-8 sm:rounded-md sm:border sm:px-12">
         {/* <Tooltip>
           <TooltipTrigger asChild>
             <button
@@ -78,6 +78,9 @@ export function PromptForm({
           spellCheck={false}
           className="min-h-[60px] w-full resize-none bg-transparent px-4 py-[1.3rem] focus-within:outline-none sm:text-sm"
         />
+        <div className="absolute left-0 top-0">
+          <Transcribe setInput={setInput} />
+        </div>
         <div className="absolute right-0 top-4 sm:right-4">
           <Tooltip>
             <TooltipTrigger asChild>
