@@ -5,6 +5,7 @@ import {
   type MLCEngineInterface,
   MLCEngine,
   WebWorkerMLCEngine,
+  deleteChatConfigInCache,
   prebuiltAppConfig,
 } from "@mlc-ai/web-llm";
 
@@ -20,7 +21,8 @@ import {
  *
  *  2. **Custom** — explicit `modelParamsUrl` + `wasmUrl`. We build a
  *     `ModelRecord` on the fly and install it via `setAppConfig` before
- *     `reload`. Used for models that aren't in the prebuilt list.
+ *     `reload`. Used for the recompiled Dolphin 2.2.1 and the preserved
+ *     vintage entries.
  */
 export type WebGPUModel = {
   modelName: string;
@@ -51,17 +53,26 @@ export class LLMInBrowser {
   }
 
   /**
-   * If the model supplies its own weights + wasm URLs, splice a custom
-   * `ModelRecord` into the prebuilt app config so `engine.reload(modelName)`
-   * can find it.
+   * Build an AppConfig that includes both the web-llm prebuilt list *and* any
+   * custom model record we need for a "vintage" entry, so the chat can switch
+   * between them freely.
    */
   private buildAppConfig(model: WebGPUModel): AppConfig | null {
     if (model.wasmUrl && model.modelParamsUrl) {
+      // web-llm's internal `cleanModelUrl` calls `new URL(modelUrl).href`
+      // unconditionally and throws on relative URLs, so resolve against the
+      // current origin ourselves before handing it over. This lets
+      // `modelParamsUrl` be either a fully qualified HF link (what we use in
+      // production) or a path under `/public/` for local serving during dev.
+      let modelHref = model.modelParamsUrl;
+      if (!/^https?:\/\//i.test(modelHref) && typeof self !== "undefined") {
+        modelHref = new URL(modelHref, self.location.origin).href;
+      }
       return {
         model_list: [
           ...prebuiltAppConfig.model_list,
           {
-            model: model.modelParamsUrl,
+            model: modelHref,
             model_id: model.modelName,
             model_lib: model.wasmUrl,
           },
@@ -100,6 +111,16 @@ export class LLMInBrowser {
     const customAppConfig = this.buildAppConfig(model);
     if (customAppConfig) {
       this.engine.setAppConfig(customAppConfig);
+      // For locally-served ("custom") models we may be iterating on
+      // mlc-chat-config.json (e.g. tokenizer_files, stop_token_ids). web-llm
+      // caches the config in a separate `webllm/config` store keyed by URL,
+      // so without this evict, any edit to the on-disk config is invisible
+      // until the user clears site data. The weight cache is untouched.
+      try {
+        await deleteChatConfigInCache(model.modelName, customAppConfig);
+      } catch (err) {
+        console.warn("Could not clear cached chat config:", err);
+      }
     }
     this.engine.setInitProgressCallback(this.setLoadingState);
     this.chatState = "loading";

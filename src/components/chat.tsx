@@ -19,10 +19,12 @@ export interface ChatProps extends React.ComponentProps<"div"> {
 // Edit this line to change if you're calling a local model or not. Make sure to set an OPENAI_API_KEY in the env file!
 const USE_LOCAL_CHAT = true;
 // Select your local model. You might be able to hotswap this at runtime, haven't tested.
-// The original `dolphin-2.2.1` is preserved as `dolphin-2.2.1-vintage` — its
-// wasm is from 2023 and no longer loads on the current MLC runtime. Until we
-// rebuild it, default to the closest prebuilt Mistral-7B ChatML peer.
-const localModelName: keyof typeof SUPPORTED_LOCAL_MODELS = "openhermes-2.5";
+// Note (Apr 2026 resurrection): the original 2023 `dolphin-2.2.1` wasm was
+// compiled against a much older MLC runtime and is preserved as the
+// `dolphin-2.2.1-vintage` entry for archaeology. The default here points at
+// the current recompile (`hrishioa/Dolphin-2.2.1-Mistral-7B-q4f32_1-MLC` on
+// HF), built fresh against web-llm's `v0_2_80` runtime. See resurrection_log.md.
+const localModelName: keyof typeof SUPPORTED_LOCAL_MODELS = "dolphin-2.2.1";
 
 export function Chat({ id, initialMessages, className }: ChatProps) {
   const selectedModel = SUPPORTED_LOCAL_MODELS[localModelName];

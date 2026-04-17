@@ -14,9 +14,11 @@ import { WebGPUModel } from "./wasmllm";
  *    are fetched from `mlc-ai/*` on Hugging Face with matching model
  *    libraries, so they actually load on today's Chrome.
  *
- * `openhermes-2.5` is the closest same-era spiritual peer to Dolphin 2.2.1
- * (also a Mistral-7B ChatML fine-tune) and comes straight from `mlc-ai`'s
- * prebuilt list. Good default until we bring Dolphin back properly.
+ * The default (see `src/components/chat.tsx`) is `dolphin-2.2.1` — the
+ * resurrected Mistral-7B fine-tune re-quantized with current MLC and rehosted
+ * on HF. `openhermes-2.5` is the closest same-era spiritual peer (also a
+ * Mistral-7B ChatML fine-tune) and comes straight from `mlc-ai`'s prebuilt
+ * list; it's a good fallback for low-bandwidth situations.
  */
 export const SUPPORTED_LOCAL_MODELS: {
   [key: string]: WebGPUModel;
@@ -26,6 +28,23 @@ export const SUPPORTED_LOCAL_MODELS: {
     modelName: "OpenHermes-2.5-Mistral-7B-q4f16_1-MLC",
     rootUrl:
       "https://huggingface.co/mlc-ai/OpenHermes-2.5-Mistral-7B-q4f16_1-MLC",
+  },
+
+  // Re-compiled from the original cognitivecomputations weights using
+  // `mlc_llm convert_weight` against the current runtime (MLC v0_2_80), then
+  // re-hosted at `hrishioa/Dolphin-2.2.1-Mistral-7B-q4f32_1-MLC` on HF. The
+  // WebGPU library is reused from `mlc-ai/binary-mlc-llm-libs` since Dolphin
+  // 2.2.1 is a Mistral-7B architecture — identical to Mistral-7B-Instruct-v0.3's
+  // wasm. See resurrection_log.md, Attempts 5 and 5b.
+  "dolphin-2.2.1": {
+    simpleName: "Dolphin 2.2.1 (Mistral-7B, resurrected)",
+    modelName: "Dolphin-2.2.1-Mistral-7B-q4f32_1-MLC",
+    rootUrl:
+      "https://huggingface.co/hrishioa/Dolphin-2.2.1-Mistral-7B-q4f32_1-MLC",
+    modelParamsUrl:
+      "https://huggingface.co/hrishioa/Dolphin-2.2.1-Mistral-7B-q4f32_1-MLC",
+    wasmUrl:
+      "https://raw.githubusercontent.com/mlc-ai/binary-mlc-llm-libs/main/web-llm-models/v0_2_80/Mistral-7B-Instruct-v0.3-q4f32_1-ctx4k_cs1k-webgpu.wasm",
   },
   "hermes-3-llama-3.1-8b": {
     simpleName: "Hermes 3 Llama 3.1 8B (modern peer)",
