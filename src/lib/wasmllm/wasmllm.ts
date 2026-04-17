@@ -1,56 +1,84 @@
-import { ChatInterface, ChatModule, ChatWorkerClient } from "@mlc-ai/web-llm";
+import {
+  type AppConfig,
+  type ChatCompletionMessageParam,
+  type InitProgressReport,
+  type MLCEngineInterface,
+  MLCEngine,
+  WebWorkerMLCEngine,
+  prebuiltAppConfig,
+} from "@mlc-ai/web-llm";
 
+/**
+ * Describes one selectable model for the UI.
+ *
+ * Two shapes are supported:
+ *
+ *  1. **Prebuilt** — a `modelName` that already exists in
+ *     `prebuiltAppConfig.model_list` from `@mlc-ai/web-llm`. `wasmUrl` and
+ *     `modelParamsUrl` can be omitted; the library already knows where to
+ *     fetch weights and the compatible model library from.
+ *
+ *  2. **Custom** — explicit `modelParamsUrl` + `wasmUrl`. We build a
+ *     `ModelRecord` on the fly and install it via `setAppConfig` before
+ *     `reload`. Used for models that aren't in the prebuilt list.
+ */
 export type WebGPUModel = {
   modelName: string;
-  modelParamsUrl: string;
+  modelParamsUrl?: string;
   rootUrl?: string;
-  wasmUrl: string;
+  wasmUrl?: string;
   simpleName: string;
 };
 
+type ChatState = "unloaded" | "loading" | "ready" | "streaming";
+
 export class LLMInBrowser {
-  private chat: ChatInterface;
-  private chatState: "unloaded" | "loading" | "ready" | "streaming" =
-    "unloaded";
-  private loadingPercent: number = 0;
-  private loadingMessage: string = "";
-  private latestResponse: string = "";
+  private engine: MLCEngineInterface;
+  private chatState: ChatState = "unloaded";
+  private loadingPercent = 0;
+  private loadingMessage = "";
+  private latestResponse = "";
   private model: WebGPUModel | null = null;
+  private history: ChatCompletionMessageParam[] = [];
+  private abortRequested = false;
 
   constructor(
-    worker: Worker,
+    worker: Worker | null,
     private readonly loadingMessageCallback?: (message: string) => void,
     private readonly loadingProgressCallback?: (percent: number) => void,
   ) {
-    if (worker) {
-      this.chat = new ChatWorkerClient(worker);
-    } else {
-      this.chat = new ChatModule();
+    this.engine = worker ? new WebWorkerMLCEngine(worker) : new MLCEngine();
+  }
+
+  /**
+   * If the model supplies its own weights + wasm URLs, splice a custom
+   * `ModelRecord` into the prebuilt app config so `engine.reload(modelName)`
+   * can find it.
+   */
+  private buildAppConfig(model: WebGPUModel): AppConfig | null {
+    if (model.wasmUrl && model.modelParamsUrl) {
+      return {
+        model_list: [
+          ...prebuiltAppConfig.model_list,
+          {
+            model: model.modelParamsUrl,
+            model_id: model.modelName,
+            model_lib: model.wasmUrl,
+          },
+        ],
+        useIndexedDBCache: prebuiltAppConfig.useIndexedDBCache,
+      };
     }
+    return null;
   }
 
-  private getModelConfig(model: WebGPUModel) {
-    return {
-      model_list: [
-        {
-          model_url: model.modelParamsUrl,
-          local_id: model.modelName,
-        },
-      ],
-      model_lib_map: {
-        [model.modelName]: model.wasmUrl,
-      },
-    };
-  }
-
-  setLoadingState(report: any) {
+  private setLoadingState = (report: InitProgressReport) => {
     this.loadingMessage = report.text;
-    this.loadingPercent = report.progress * 100;
-    this.loadingMessageCallback && this.loadingMessageCallback(report.text);
-    this.loadingProgressCallback &&
-      this.loadingProgressCallback(report.progress * 100);
+    this.loadingPercent = Math.round(report.progress * 100);
+    this.loadingMessageCallback?.(report.text);
+    this.loadingProgressCallback?.(this.loadingPercent);
     if (report.progress >= 1) this.chatState = "ready";
-  }
+  };
 
   getState() {
     return {
@@ -62,68 +90,54 @@ export class LLMInBrowser {
   }
 
   async load(model: WebGPUModel) {
-    this.model = model;
-    if (this.chatState === "unloaded") {
-      console.log(
-        "Loading ",
-        model.modelName,
-        " with config ",
-        this.getModelConfig(model),
-      );
-      this.chat.setInitProgressCallback(this.setLoadingState.bind(this));
-      this.chatState = "loading";
-      await this.chat.reload(
-        this.model.modelName,
-        undefined,
-        this.getModelConfig(this.model),
-      );
-      this.chatState = "ready";
-    } else {
-      console.error("LLM doesnt need to be loaded - state is ", this.chatState);
+    if (this.chatState !== "unloaded") {
+      console.error("LLM doesn't need to be loaded - state is", this.chatState);
+      return;
     }
+    this.model = model;
+    console.log("Loading", model.modelName);
+
+    const customAppConfig = this.buildAppConfig(model);
+    if (customAppConfig) {
+      this.engine.setAppConfig(customAppConfig);
+    }
+    this.engine.setInitProgressCallback(this.setLoadingState);
+    this.chatState = "loading";
+    await this.engine.reload(model.modelName);
+    this.chatState = "ready";
   }
 
   async stop() {
-    if(this.chatState === "streaming") {
-      await this.chat.interruptGenerate();
+    if (this.chatState === "streaming") {
+      this.abortRequested = true;
+      await this.engine.interruptGenerate();
       this.chatState = "ready";
     }
   }
 
-  async unload(force: boolean = false) {
+  async unload(force = false) {
     if (force || this.chatState === "unloaded" || this.chatState === "ready") {
-      await this.chat.unload();
+      await this.engine.unload();
       this.chatState = "unloaded";
       this.loadingPercent = 0;
     } else {
-      console.error("Not being forced, and chat state is ", this.chatState);
+      console.error("Not being forced, and chat state is", this.chatState);
     }
   }
 
   async clearHistory() {
-    await this.chat.resetChat();
+    this.history = [];
+    await this.engine.resetChat();
   }
 
   async ask(
     input: string,
     partialMessageCallback?: (partialMessage: string) => void,
     onFinishCallback?: (fullMessage: string) => void,
-    interrupt: boolean = false,
+    interrupt = false,
   ) {
-    const getResponsetoken = (step: number, message: string) => {
-      if (this.chatState === "ready") return;
-      if (message.length === 0) {
-        this.chat.interruptGenerate();
-        this.chatState = "ready";
-        onFinishCallback && onFinishCallback(this.latestResponse);
-        return;
-      }
-      this.latestResponse = message;
-      if (partialMessageCallback) partialMessageCallback(message);
-    };
-
     if (this.chatState === "streaming" && interrupt) {
-      await this.chat.interruptGenerate();
+      await this.stop();
     } else if (this.chatState !== "ready") {
       console.error("Chat is not ready for new ask");
       return;
@@ -131,10 +145,33 @@ export class LLMInBrowser {
 
     this.chatState = "streaming";
     this.latestResponse = "";
-    this.chat.generate(input, getResponsetoken.bind(this)).then(() => {
-      if (this.chatState !== "ready")
-        onFinishCallback && onFinishCallback(this.latestResponse);
-      this.chatState = "ready";
-    });
+    this.abortRequested = false;
+    this.history.push({ role: "user", content: input });
+
+    try {
+      const stream = await this.engine.chat.completions.create({
+        messages: this.history,
+        stream: true,
+      });
+      for await (const chunk of stream) {
+        if (this.abortRequested) break;
+        const delta = chunk.choices[0]?.delta?.content ?? "";
+        if (!delta) continue;
+        this.latestResponse += delta;
+        partialMessageCallback?.(this.latestResponse);
+      }
+
+      this.history.push({
+        role: "assistant",
+        content: this.latestResponse,
+      });
+    } catch (err) {
+      console.error("Generation failed:", err);
+      this.history.pop(); // remove the user turn we never answered
+      throw err;
+    } finally {
+      if (this.chatState !== "ready") this.chatState = "ready";
+      onFinishCallback?.(this.latestResponse);
+    }
   }
 }
