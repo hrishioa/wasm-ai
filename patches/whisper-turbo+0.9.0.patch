@@ -1,0 +1,49 @@
+diff --git a/node_modules/whisper-turbo/dist/db/modelDB.js b/node_modules/whisper-turbo/dist/db/modelDB.js
+index dede240..e85e2a0 100644
+--- a/node_modules/whisper-turbo/dist/db/modelDB.js
++++ b/node_modules/whisper-turbo/dist/db/modelDB.js
+@@ -50,21 +50,40 @@ export default class ModelDB {
+                 if (!response.ok) {
+                     return Result.err(new Error(`Fetch failed: ${response.status}`));
+                 }
+-                const contentLength = +response.headers.get("Content-Length");
++                // Content-Length is a CORS-safelisted response header, but it
++                // is only exposed to JS cross-origin when the server lists it
++                // in Access-Control-Expose-Headers. Hugging Face does NOT
++                // expose it (as of 2026), so `r.headers.get('Content-Length')`
++                // returns null, which used to collapse into
++                // `new Uint8Array(+null) === new Uint8Array(0)` and overflow
++                // on the first `chunks.set(value, 0)`. Collect chunks and
++                // concatenate at the end instead — works with or without a
++                // known total size.
++                const contentLengthHeader = response.headers.get("Content-Length");
++                const contentLength = contentLengthHeader ? +contentLengthHeader : 0;
+                 const reader = response.body.getReader();
++                const parts = [];
+                 let receivedLength = 0;
+-                const chunks = new Uint8Array(contentLength);
+                 for (;;) {
+                     const { done, value } = yield reader.read();
+                     if (done) {
+                         break;
+                     }
+-                    chunks.set(value, receivedLength);
++                    parts.push(value);
+                     receivedLength += value.length;
+-                    if (onProgress) {
++                    if (onProgress && contentLength > 0) {
+                         onProgress((receivedLength / contentLength) * 100);
+                     }
+                 }
++                const chunks = new Uint8Array(receivedLength);
++                let offset = 0;
++                for (const part of parts) {
++                    chunks.set(part, offset);
++                    offset += part.length;
++                }
++                if (onProgress && contentLength === 0) {
++                    onProgress(100);
++                }
+                 return Result.ok(chunks);
+             });
+             return yield pRetry(run, { retries: 3 });
