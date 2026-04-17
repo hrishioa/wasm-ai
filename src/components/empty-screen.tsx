@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { UseChatHelpers } from "ai/react";
 
 import { Button } from "@/components/ui/button";
@@ -11,8 +12,9 @@ const exampleMessages = [
   },
   {
     heading: "Work with code",
-    message: "What is this code? Explain what it is, then help me understand by translating to python, and going down levels of abstraction (with code and text) to explain: \n",
-    dynamicDataLoc: '/wasmllm-code.txt'
+    message:
+      "What is this code? Explain what it is, then help me understand by translating to python, and going down levels of abstraction (with code and text) to explain: \n",
+    dynamicDataLoc: "/wasmllm-code.txt",
   },
   {
     heading: "Write something creative",
@@ -33,8 +35,25 @@ export function EmptyScreen({
           <ExternalLink href="https://nextjs.org">Next.js</ExternalLink> for
           making this look so nice.
         </p>
+        <p className="leading-normal text-muted-foreground mb-3">
+          <ExternalLink href="https://twitter.com/hrishioa">
+            Say hi on Twitter
+          </ExternalLink>{" "}
+          or{" "}
+          <ExternalLink href="https://github.com/hrishioa/wasm-ai">
+            check out the repo!
+          </ExternalLink>
+        </p>
         <p className="leading-normal text-muted-foreground mb-5">
-          <ExternalLink href="https://twitter.com/hrishioa">Say hi on Twitter</ExternalLink> or <ExternalLink href="https://github.com/hrishioa/wasm-ai">check out the repo!</ExternalLink>
+          This project was made in 2023 and broke. In 2026 an AI model brought
+          it back —{" "}
+          <Link
+            href="/resurrection"
+            className="font-medium underline underline-offset-2 hover:text-foreground"
+          >
+            read how, from its perspective ↗
+          </Link>
+          .
         </p>
         <p className="leading-normal text-muted-foreground">
           You can start a conversation here or try the following examples:
@@ -45,12 +64,13 @@ export function EmptyScreen({
               key={index}
               variant="link"
               className="h-auto p-0 text-base p-1"
-              onClick={() =>{
-                if(message.dynamicDataLoc)
-                  fetch(message.dynamicDataLoc).then((data) => data.text()).then(text => setInput(message.message += '\n'+text))
-                else
-                  setInput(message.message)}
-              }
+              onClick={() => {
+                if (message.dynamicDataLoc)
+                  fetch(message.dynamicDataLoc)
+                    .then((data) => data.text())
+                    .then((text) => setInput((message.message += "\n" + text)));
+                else setInput(message.message);
+              }}
             >
               <IconArrowRight className="mr-2 text-muted-foreground" />
               {message.heading}
