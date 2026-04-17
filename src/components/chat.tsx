@@ -26,6 +26,16 @@ const USE_LOCAL_CHAT = true;
 // HF), built fresh against web-llm's `v0_2_80` runtime. See resurrection_log.md.
 const localModelName: keyof typeof SUPPORTED_LOCAL_MODELS = "dolphin-2.2.1";
 
+// The `USE_LOCAL_CHAT ? useLocalChat(...) : useChat(...)` swap is a
+// conditional hook by the letter of the rule — but in practice
+// `USE_LOCAL_CHAT` is a module-level constant, so which branch runs is
+// fixed at build time and the hook call order is stable across renders.
+// The per-line `eslint-disable-next-line` the original author left
+// stopped covering the right line after prettier reflowed this block
+// across multiple lines, so make the allowance explicit at file scope
+// for just that one rule.
+/* eslint-disable react-hooks/rules-of-hooks */
+
 export function Chat({ id, initialMessages, className }: ChatProps) {
   const selectedModel = SUPPORTED_LOCAL_MODELS[localModelName];
   const {
@@ -38,14 +48,11 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
     isLoading,
     input,
     setInput,
-    // Apologies eslint this is just me showing off
-    // eslint-disable-next-line react-hooks/rules-of-hooks
   } = USE_LOCAL_CHAT
     ? useLocalChat({
         model: selectedModel,
         initialMessages: initialMessages,
         initialInput: "",
-        // eslint-disable-next-line react-hooks/rules-of-hooks
       })
     : {
         ...useChat({
