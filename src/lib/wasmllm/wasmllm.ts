@@ -191,7 +191,13 @@ export class LLMInBrowser {
       this.history.pop(); // remove the user turn we never answered
       throw err;
     } finally {
-      if (this.chatState !== "ready") this.chatState = "ready";
+      // Always settle to "ready" after the stream ends — whether it finished
+      // naturally, threw, or was aborted via this.stop(). Written as an
+      // unconditional assignment because TypeScript's control-flow analysis
+      // narrows `this.chatState` to "streaming" at this point in the try /
+      // finally and rejects a comparison to "ready" as unreachable; the
+      // guard was purely defensive anyway.
+      this.chatState = "ready";
       onFinishCallback?.(this.latestResponse);
     }
   }
