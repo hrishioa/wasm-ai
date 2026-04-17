@@ -36,3 +36,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local MLC compile workspace — re-quantized weights are hosted on HF
+# (see resurrection_log.md, Attempt 5) so this 3.8 GB intermediate stays
+# local. Safe to delete if you don't plan to recompile.
+/.mlc-build/
