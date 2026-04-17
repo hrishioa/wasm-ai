@@ -9,7 +9,7 @@ import { EmptyScreen } from "@/components/empty-screen";
 import { ChatScrollAnchor } from "@/components/chat-scroll-anchor";
 import { useLocalChat } from "@/lib/wasmllm/use-wasm-llm";
 import { SUPPORTED_LOCAL_MODELS } from "@/lib/wasmllm/supported-models";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 
 export interface ChatProps extends React.ComponentProps<"div"> {
   initialMessages?: Message[];
@@ -19,11 +19,14 @@ export interface ChatProps extends React.ComponentProps<"div"> {
 // Edit this line to change if you're calling a local model or not. Make sure to set an OPENAI_API_KEY in the env file!
 const USE_LOCAL_CHAT = true;
 // Select your local model. You might be able to hotswap this at runtime, haven't tested.
-const localModelName: keyof typeof SUPPORTED_LOCAL_MODELS = "dolphin-2.2.1";
+// The original `dolphin-2.2.1` is preserved as `dolphin-2.2.1-vintage` — its
+// wasm is from 2023 and no longer loads on the current MLC runtime. Until we
+// rebuild it, default to the closest prebuilt Mistral-7B ChatML peer.
+const localModelName: keyof typeof SUPPORTED_LOCAL_MODELS = "openhermes-2.5";
 
 export function Chat({ id, initialMessages, className }: ChatProps) {
   const selectedModel = SUPPORTED_LOCAL_MODELS[localModelName];
-    const {
+  const {
     loadingMessage,
     loadingProgress,
     messages,
@@ -33,25 +36,31 @@ export function Chat({ id, initialMessages, className }: ChatProps) {
     isLoading,
     input,
     setInput,
-  // Apologies eslint this is just me showing off
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  } = USE_LOCAL_CHAT ? useLocalChat({
-    model: selectedModel,
-    initialMessages: initialMessages,
-    initialInput: "",
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  }) : {...useChat({
-    initialMessages,
-    id,
-    body: {
-      id,
-    },
-    onResponse(response) {
-      if (response.status === 401) {
-        toast.error(response.statusText)
-      }
-    }
-  }), loadingMessage: "You are now talking to a cloud model. Boo!", loadingProgress: 100};
+    // Apologies eslint this is just me showing off
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+  } = USE_LOCAL_CHAT
+    ? useLocalChat({
+        model: selectedModel,
+        initialMessages: initialMessages,
+        initialInput: "",
+        // eslint-disable-next-line react-hooks/rules-of-hooks
+      })
+    : {
+        ...useChat({
+          initialMessages,
+          id,
+          body: {
+            id,
+          },
+          onResponse(response) {
+            if (response.status === 401) {
+              toast.error(response.statusText);
+            }
+          },
+        }),
+        loadingMessage: "You are now talking to a cloud model. Boo!",
+        loadingProgress: 100,
+      };
 
   return (
     <>
