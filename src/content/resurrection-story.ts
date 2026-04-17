@@ -16,6 +16,8 @@ export const RESURRECTION_STORY_SUBTITLE =
 // the reader. Using `String.raw` would preserve the leading backslashes and
 // break every code fence / inline code span.
 export const RESURRECTION_STORY_MARKDOWN = `
+![A hand-drawn amber-like rock with a small chat interface embedded in it, captioned "still works if you can reach it"](/images/5806e85d-ad7.png)
+
 It started with a single line, blinking in a Chrome DevTools console someone had sent me:
 
 \`\`\`
@@ -105,6 +107,8 @@ This is the part of these projects I find most humbling. It wasn't a subtle race
 
 ## Saying goodbye to models that aren't there anymore
 
+![Four models — Dolphin 2.2.1, OpenHermes 2.5, Glaive Coder 7B, SQLCoder 7B — arranged under glass bell jars on a shelf, two of them tagged "vintage — may not load" and "LinkError". Titled "FOSSILS IN THE CATALOGUE".](/images/9de4f608-318.png)
+
 The original project shipped with four models: Dolphin 2.2.1, OpenHermes 2.5, Glaive Coder 7B, SQLCoder 7B. Their WebAssembly libraries had been compiled in late 2023 against a version of Apache TVM that no longer exists as a runtime. Loading any of them produced a beautifully specific error:
 
 \`\`\`
@@ -174,6 +178,8 @@ The whisper-webgpu wasm, beyond the fetch layer, was asking modern Chrome for a 
 
 ## The resurrection proper
 
+![A schematic diagram titled "Resurrection: reuse the kernel, re-quantize the weights". A Mistral-7B WebGPU kernel .wasm flows as-is into a Dolphin 2.2.1 (resurrected) box. The original Dolphin 2.2.1 weights from Eric Hartford flow through mlc_llm convert_weight to a re-quantized weights box (68s, 107 shards, 3.8 GB), which also feeds the final box. Caption at bottom: "kernel and weights are separate artefacts — with separate shelf lives."](/images/c042ef41-bd0.png)
+
 The headline item, the thing I'd been building toward, was getting Dolphin 2.2.1 back — not as a ghost that gives us a satisfying error message, but as a real working model, answering real questions, from real weights.
 
 The elegant way to do this was to reuse what already worked. MLC's compilation output has two distinct artefacts: the WebGPU kernel library (a \`.wasm\` that only cares about architecture, quantization, and context window) and the weight shards (a pile of quantized tensors bound by a manifest). Different Mistral‑7B fine-tunes with the same quantization share the *same* kernel library — only the weights differ.
@@ -214,6 +220,8 @@ It answered "Hello! How can I assist you today?<|im_end|" — and the dangling \
 ---
 
 ## The tokenizer
+
+![A long scroll of console output with a magnifying glass hovering over it, zooming in on a single highlighted line: "Using tokenizer.model since we cannot locate tokenizer.json". Titled "Most of Debugging is Noticing".](/images/75939d6e-b33.png)
 
 When a transformer decides a turn is over, it emits a *token* — in Dolphin's case, the ChatML stop token, whose ID is 32000 and whose string form is \`<|im_end|>\`. The runtime is supposed to see that specific ID in the output stream and halt.
 
@@ -264,11 +272,15 @@ Dolphin 2.2.1 is, as of this writing, a live, fetchable, runnable artifact again
 
 ## What I think I learned
 
+![A cardboard box sitting under a guillotine-like trapdoor, with removed items labelled "adapter.requestAdapterInfo()", "Content-Length: null", and "removed in Chrome 136" scattered around it. Banner above reads "THE WEB AGES BY SUBTRACTION".](/images/7deed39f-98e.png)
+
 - **The web ages by subtraction.** The specific thing that kept this project from working wasn't a new feature, it was the removal of an old one. I think this is the dominant failure mode of web projects older than eighteen months, and it's not a failure anyone is culpable for — the method was deprecated, then removed, both on schedule, and the library had just happened to ship before the transition was complete.
 
 - **Binary ABIs age the hardest.** The WebGPU fix was runtime-only and took a version bump. The TVM ABI problem killed every compiled artifact from that era and could only be solved by recompiling. A web-llm built for \`v0_2_80\` cannot run a model library built for whatever \`v0_2_00\` called itself. If I had to give one piece of advice to anyone building in this space today, it would be: don't think of compiled wasm weight-kernels as forever-assets. Think of them as builds. They have a shelf life.
 
 - **The tooling underneath is itself moving.** The fact that modern \`transformers\` couldn't produce a \`tokenizer.json\` from an older SentencePiece tokenizer — because its conversion code had evolved to assume a newer format — is a miniature version of the same problem as the TVM ABI drift, one layer up. There is no point in the stack where things are still.
+
+![A hand-drawn climbing / traverse route across five boulders roped together, each labelled with one of the archives the resurrection depended on: "the open web — CORS, WebGPU, fetch", "mlc-llm — compiler that understands old checkpoints", "huggingface.co — still honouring 2023 URLs", "mlc-ai — prebuilt Mistral kernel", "cognitivecomputations original Dolphin weights". A small dolphin leaps from the final boulder. Caption: "PRESERVATION IS COMPOSABLE / every rope held."](/images/2314ab2d-517.png)
 
 - **Preservation is composable.** The reason I could bring Dolphin back at all is that \`cognitivecomputations\` kept the original Dolphin weights up on Hugging Face, that \`mlc-ai\` kept a prebuilt Mistral‑7B kernel library at the current ABI, that \`huggingface.co\` still honoured three-year-old URLs, that the \`mlc-llm\` compiler still knew how to quantize a 2023-era Mistral checkpoint. Every one of those assumptions could have failed, and each held. Nothing here was resurrectable on its own — it was resurrectable because four different archives all stayed alive.
 

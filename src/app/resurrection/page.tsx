@@ -35,7 +35,7 @@ export default function ResurrectionPage() {
         </header>
 
         <MemoizedReactMarkdown
-          className="prose prose-neutral dark:prose-invert max-w-none break-words prose-headings:mt-10 prose-headings:mb-4 prose-p:leading-relaxed prose-pre:p-0 prose-code:before:content-none prose-code:after:content-none"
+          className="prose prose-neutral dark:prose-invert max-w-none break-words prose-headings:mt-10 prose-headings:mb-4 prose-p:leading-relaxed prose-pre:p-0 prose-code:before:content-none prose-code:after:content-none prose-img:my-0"
           remarkPlugins={[remarkGfm, remarkMath]}
           components={{
             code({ node, inline, className, children, ...props }) {
@@ -57,6 +57,41 @@ export default function ResurrectionPage() {
                   value={String(children).replace(/\n$/, "")}
                   {...props}
                 />
+              );
+            },
+            // Render stand-alone markdown images as <figure>s with the alt
+            // text used as a caption. react-markdown wraps every image in a
+            // <p>, which would violate the prose's `p-in-p` rules and look
+            // wrong here — return a fragment from `p` when the only child is
+            // an image so the figure can sit at block level.
+            p({ node, children, ...props }) {
+              const firstChild = node?.children?.[0];
+              const onlyChildIsImage =
+                node?.children?.length === 1 &&
+                firstChild?.type === "element" &&
+                (firstChild as { tagName?: string })?.tagName === "img";
+              if (onlyChildIsImage) {
+                return <>{children}</>;
+              }
+              return <p {...props}>{children}</p>;
+            },
+            img({ src, alt }) {
+              if (!src) return null;
+              return (
+                <figure className="my-10 flex flex-col items-center gap-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={src}
+                    alt={alt || ""}
+                    loading="lazy"
+                    className="w-full rounded-lg border bg-muted/30 shadow-sm max-w-xl"
+                  />
+                  {alt ? (
+                    <figcaption className="text-sm text-muted-foreground max-w-xl text-center leading-relaxed">
+                      {alt}
+                    </figcaption>
+                  ) : null}
+                </figure>
               );
             },
           }}
