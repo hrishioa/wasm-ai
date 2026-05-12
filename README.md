@@ -60,6 +60,7 @@ _This repo is the work of one overworked dev, and meant to be for educational pu
 Deploy your own to Vercel with a single click:
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fhrishioa%2Fwasm-ai&project-name=custom-wasm-ai&repository-name=custom-wasm-ai&demo-title=WASM%20AI&demo-description=Run%20large%20language%20models%20in%20the%20browser%2C%20using%20WebGPU.&demo-url=https%3A%2F%2Fwasmai.vercel.app)
+[![Deploy to PandaStack](https://dashboard.pandastack.io/deploy-button.svg)](https://dashboard.pandastack.io/deploy?repo=hrishioa/wasm-ai&type=static&buildCmd=npm+run+build&outputDir=dist)
 
 # Usage
 
